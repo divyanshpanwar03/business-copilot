@@ -1,7 +1,7 @@
 from database import SessionLocal
 from models import BusinessProfileDB, ComplianceRule
 import operator
-
+from rule_engine import get_applicable_rules
 OPERATORS = {
     ">=": operator.ge,
     ">": operator.gt,
@@ -43,17 +43,12 @@ db = SessionLocal()
 profile = db.get(BusinessProfileDB, 1)
 rules = db.query(ComplianceRule).all()
 
-applicable_rules = []
-
-for rule in rules:
-    result = evaluate_rule(profile, rule)
-
-    if result:
-        applicable_rules.append(rule)
-
-print("Applicable obligations:")
+applicable_rules = get_applicable_rules(
+    profile,
+    rules
+)
 
 for rule in applicable_rules:
-    print("-", rule.obligation)
+    print(rule.name)
 
 db.close()

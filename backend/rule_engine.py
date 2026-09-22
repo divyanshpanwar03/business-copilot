@@ -46,14 +46,60 @@ def evaluate_rule(profile, rule):
         condition_value
     )
 
+def evaluate_condition(profile, condition):
+    field_value = getattr(
+        profile,
+        condition.condition_field
+    )
+
+    operator_function = OPERATORS.get(
+        condition.condition_operator
+    )
+
+    if operator_function is None:
+        raise ValueError(
+            f"Unsupported operator: "
+            f"{condition.condition_operator}"
+        )
+
+    field_value, condition_value = convert_value(
+        field_value,
+        condition.condition_value
+    )
+
+    return operator_function(
+        field_value,
+        condition_value
+    )
 
 def get_applicable_rules(profile, rules):
     applicable_rules = []
 
     for rule in rules:
-        result = evaluate_rule(profile, rule)
 
-        if result:
+        condition_results = []
+
+        for condition in rule.conditions:
+            result = evaluate_condition(
+                profile,
+                condition
+            )
+
+            condition_results.append(result)
+
+        if rule.condition_logic == "AND":
+            rule_applies = all(condition_results)
+
+        elif rule.condition_logic == "OR":
+            rule_applies = any(condition_results)
+
+        else:
+            raise ValueError(
+                f"Unsupported condition logic: "
+                f"{rule.condition_logic}"
+            )
+
+        if rule_applies:
             applicable_rules.append(rule)
 
     return applicable_rules
