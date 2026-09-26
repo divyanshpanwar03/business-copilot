@@ -127,6 +127,12 @@ def get_compliance(
     for rule in applicable_rules:
      applicable_rule_data.append({
         "name": rule.name,
+        "description": rule.description,
+        "category": rule.category,
+        "priority": rule.priority,
+        "frequency": rule.frequency,
+        "effective_from": rule.effective_from,
+        "effective_to": rule.effective_to,
         "obligation": rule.obligation,
         "source": rule.source
     })
