@@ -1,6 +1,8 @@
 from sqlalchemy import Boolean, Date, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from datetime import date
+from sqlalchemy import String
+from pgvector.sqlalchemy import VECTOR
 
 class Base(DeclarativeBase):
     pass
@@ -57,3 +59,40 @@ class RuleCondition(Base):
     rule: Mapped["ComplianceRule"] = relationship(
         back_populates="conditions"
     )
+
+class DocumentChunk(Base):
+    __tablename__ = "document_chunks"
+
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+    document_name: Mapped[str] = mapped_column(
+        String
+    )
+    source: Mapped[str] = mapped_column(
+        String
+    )
+    authority: Mapped[str] = mapped_column(
+        String
+    )
+    page_number: Mapped[int] = mapped_column(
+        Integer
+    )
+    section: Mapped[str | None] = mapped_column(
+        String,
+        nullable=True
+    )
+    chunk_text: Mapped[str] = mapped_column(
+        String
+    )
+    content_hash: Mapped[str] = mapped_column(
+    String(64),
+    index=True
+)
+    embedding: Mapped[list[float] | None] = mapped_column(
+    VECTOR(384),
+    nullable=True
+)
+
